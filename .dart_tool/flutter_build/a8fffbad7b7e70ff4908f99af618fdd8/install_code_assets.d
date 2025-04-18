@@ -1,0 +1,1 @@
+ /home/zuuh/projects/doctor_app/.dart_tool/flutter_build/a8fffbad7b7e70ff4908f99af618fdd8/native_assets.json: 

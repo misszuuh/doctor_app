@@ -1,0 +1,13 @@
+/home/zuuh/projects/doctor_app/build/linux/x64/debug/bundle/doctor_app
+/home/zuuh/projects/doctor_app/build/linux/x64/debug/bundle/data/icudtl.dat
+/home/zuuh/projects/doctor_app/build/linux/x64/debug/bundle/lib/libflutter_linux_gtk.so
+/home/zuuh/projects/doctor_app/build/linux/x64/debug/bundle/data/flutter_assets/NOTICES.Z
+/home/zuuh/projects/doctor_app/build/linux/x64/debug/bundle/data/flutter_assets/kernel_blob.bin
+/home/zuuh/projects/doctor_app/build/linux/x64/debug/bundle/data/flutter_assets/fonts/MaterialIcons-Regular.otf
+/home/zuuh/projects/doctor_app/build/linux/x64/debug/bundle/data/flutter_assets/AssetManifest.bin
+/home/zuuh/projects/doctor_app/build/linux/x64/debug/bundle/data/flutter_assets/version.json
+/home/zuuh/projects/doctor_app/build/linux/x64/debug/bundle/data/flutter_assets/shaders/ink_sparkle.frag
+/home/zuuh/projects/doctor_app/build/linux/x64/debug/bundle/data/flutter_assets/NativeAssetsManifest.json
+/home/zuuh/projects/doctor_app/build/linux/x64/debug/bundle/data/flutter_assets/packages/cupertino_icons/assets/CupertinoIcons.ttf
+/home/zuuh/projects/doctor_app/build/linux/x64/debug/bundle/data/flutter_assets/AssetManifest.json
+/home/zuuh/projects/doctor_app/build/linux/x64/debug/bundle/data/flutter_assets/FontManifest.json

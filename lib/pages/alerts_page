@@ -1,0 +1,214 @@
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+class AlertsPage extends StatefulWidget {
+  const AlertsPage({super.key});
+
+  @override
+  State<AlertsPage> createState() => _AlertsPageState();
+}
+
+class _AlertsPageState extends State<AlertsPage> {
+  // Mock data - replace with Firebase later
+  final List<PatientAlert> _alerts = [
+    PatientAlert(
+      patientId: "1",
+      patientName: "John Doe",
+      message: "Blood Pressure > 140/90",
+      criticality: "High",
+      timestamp: DateTime.now().subtract(const Duration(minutes: 5)),
+      isRead: false,
+    ),
+    PatientAlert(
+      patientId: "2",
+      patientName: "Mary Smith",
+      message: "Heart Rate > 100 bpm",
+      criticality: "Medium",
+      timestamp: DateTime.now().subtract(const Duration(hours: 2)),
+      isRead: true,
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Alerts"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () => _showNotificationSettings(),
+          ),
+        ],
+      ),
+      body: ListView.builder(
+        itemCount: _alerts.length,
+        itemBuilder: (context, index) {
+          return _buildAlertCard(_alerts[index]);
+        },
+      ),
+    );
+  }
+
+  Widget _buildAlertCard(PatientAlert alert) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      color: alert.isRead ? Colors.white : Colors.red[50],
+      child: ListTile(
+        leading: Icon(
+          Icons.warning,
+          color: alert.criticality == "High" ? Colors.red : Colors.orange,
+        ),
+        title: Text(alert.patientName),
+        subtitle: Text(alert.message),
+        trailing: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              DateFormat('h:mm a').format(alert.timestamp),
+              style: TextStyle(
+                color: alert.isRead ? Colors.grey : Colors.black,
+              ),
+            ),
+            if (!alert.isRead)
+              const CircleAvatar(
+                radius: 4,
+                backgroundColor: Colors.red,
+              ),
+          ],
+        ),
+        onTap: () => _showAlertActions(alert),
+      ),
+    );
+  }
+
+  void _showAlertActions(PatientAlert alert) {
+    setState(() {
+      alert.isRead = true; // Mark as read
+    });
+
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "Alert: ${alert.message}",
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+              // Quick Actions
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: [
+                  _buildQuickActionButton(
+                    icon: Icons.medication,
+                    label: "Adjust Medication",
+                    onPressed: () => _prescribeMedication(alert),
+                  ),
+                  _buildQuickActionButton(
+                    icon: Icons.phone,
+                    label: "Call Caregiver",
+                    onPressed: () => _callCaregiver(alert),
+                  ),
+                  _buildQuickActionButton(
+                    icon: Icons.chat,
+                    label: "Send Advice",
+                    onPressed: () => _sendAdvice(alert),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildQuickActionButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onPressed,
+  }) {
+    return ElevatedButton.icon(
+      icon: Icon(icon),
+      label: Text(label),
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      ),
+    );
+  }
+
+  // Mock functions - replace with Firebase logic later
+  void _prescribeMedication(PatientAlert alert) {
+    Navigator.pop(context);
+    showDialog(
+      context: context,
+      builder: (context) {
+        String dosage = "";
+        return AlertDialog(
+          title: Text("Prescribe for ${alert.patientName}"),
+          content: TextField(
+            decoration: const InputDecoration(labelText: "Dosage (e.g., 10mg)"),
+            onChanged: (value) => dosage = value,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // Send to Firebase later
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Prescribed $dosage")),
+                );
+                Navigator.pop(context);
+              },
+              child: const Text("Confirm"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _callCaregiver(PatientAlert alert) {
+    Navigator.pop(context);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Calling ${alert.patientName}'s caregiver...")),
+    );
+  }
+
+  void _sendAdvice(PatientAlert alert) {
+    Navigator.pop(context);
+    Navigator.pushNamed(context, '/chat', arguments: alert.patientId);
+  }
+
+  void _showNotificationSettings() {
+    // Implement notification settings
+  }
+}
+
+class PatientAlert {
+  final String patientId;
+  final String patientName;
+  final String message;
+  final String criticality;
+  final DateTime timestamp;
+  bool isRead;
+
+  PatientAlert({
+    required this.patientId,
+    required this.patientName,
+    required this.message,
+    required this.criticality,
+    required this.timestamp,
+    this.isRead = false,
+  });
+}

@@ -1,0 +1,265 @@
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+class PrescriptionPage extends StatefulWidget {
+  final String patientId; // Will be passed from patient selection
+  final String patientName;
+
+  const PrescriptionPage({
+    super.key,
+    required this.patientId,
+    required this.patientName,
+  });
+
+  @override
+  State<PrescriptionPage> createState() => _PrescriptionPageState();
+}
+
+class _PrescriptionPageState extends State<PrescriptionPage> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _medicationController = TextEditingController();
+  final TextEditingController _dosageController = TextEditingController();
+  final TextEditingController _frequencyController = TextEditingController();
+  final TextEditingController _durationController = TextEditingController();
+  final TextEditingController _notesController = TextEditingController();
+
+  String _selectedRoute = 'Oral';
+  DateTime _selectedDate = DateTime.now();
+
+  @override
+  void dispose() {
+    _medicationController.dispose();
+    _dosageController.dispose();
+    _frequencyController.dispose();
+    _durationController.dispose();
+    _notesController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Prescribe for ${widget.patientName}'),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildPatientInfoCard(),
+              const SizedBox(height: 20),
+              _buildMedicationForm(),
+              const SizedBox(height: 30),
+              _buildActionButtons(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPatientInfoCard() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Patient: ${widget.patientName}',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text('ID: ${widget.patientId}'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMedicationForm() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Medication Details',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 16),
+        TextFormField(
+          controller: _medicationController,
+          decoration: const InputDecoration(
+            labelText: 'Medication Name',
+            border: OutlineInputBorder(),
+          ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter medication name';
+            }
+            return null;
+          },
+        ),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: TextFormField(
+                controller: _dosageController,
+                decoration: const InputDecoration(
+                  labelText: 'Dosage',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Enter dosage';
+                  }
+                  return null;
+                },
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              flex: 3,
+              child: DropdownButtonFormField<String>(
+                value: _selectedRoute,
+                decoration: const InputDecoration(
+                  labelText: 'Route',
+                  border: OutlineInputBorder(),
+                ),
+                items: const [
+                  DropdownMenuItem(value: 'Oral', child: Text('Oral')),
+                  DropdownMenuItem(value: 'IV', child: Text('IV')),
+                  DropdownMenuItem(value: 'IM', child: Text('IM')),
+                  DropdownMenuItem(value: 'Subcutaneous', child: Text('Subcutaneous')),
+                  DropdownMenuItem(value: 'Topical', child: Text('Topical')),
+                ],
+                onChanged: (value) {
+                  setState(() {
+                    _selectedRoute = value!;
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        TextFormField(
+          controller: _frequencyController,
+          decoration: const InputDecoration(
+            labelText: 'Frequency (e.g., 2 times daily)',
+            border: OutlineInputBorder(),
+          ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter frequency';
+            }
+            return null;
+          },
+        ),
+        const SizedBox(height: 16),
+        TextFormField(
+          controller: _durationController,
+          decoration: const InputDecoration(
+            labelText: 'Duration (e.g., 7 days)',
+            border: OutlineInputBorder(),
+          ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter duration';
+            }
+            return null;
+          },
+        ),
+        const SizedBox(height: 16),
+        InkWell(
+          onTap: () => _selectDate(context),
+          child: InputDecorator(
+            decoration: const InputDecoration(
+              labelText: 'Prescription Date',
+              border: OutlineInputBorder(),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(DateFormat('MMM dd, yyyy').format(_selectedDate)),
+                const Icon(Icons.calendar_today),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        TextFormField(
+          controller: _notesController,
+          decoration: const InputDecoration(
+            labelText: 'Additional Notes',
+            border: OutlineInputBorder(),
+          ),
+          maxLines: 3,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionButtons() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        ElevatedButton(
+          onPressed: _clearForm,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.grey[300],
+            foregroundColor: Colors.black,
+          ),
+          child: const Text('Clear'),
+        ),
+        const SizedBox(width: 16),
+        ElevatedButton(
+          onPressed: _submitPrescription,
+          child: const Text('Save Prescription'),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
+  }
+
+  void _clearForm() {
+    _formKey.currentState?.reset();
+    setState(() {
+      _medicationController.clear();
+      _dosageController.clear();
+      _frequencyController.clear();
+      _durationController.clear();
+      _notesController.clear();
+      _selectedRoute = 'Oral';
+      _selectedDate = DateTime.now();
+    });
+  }
+
+  void _submitPrescription() {
+    if (_formKey.currentState!.validate()) {
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Prescription saved successfully!')),
+      );
+
+      Navigator.pop(context);
+    }
+  }
+}

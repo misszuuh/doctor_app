@@ -1,0 +1,169 @@
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+class ChatbotPage extends StatefulWidget {
+  const ChatbotPage({super.key});
+
+  @override
+  State<ChatbotPage> createState() => _ChatbotPageState();
+}
+
+class _ChatbotPageState extends State<ChatbotPage> {
+  final TextEditingController _messageController = TextEditingController();
+  final List<ChatMessage> _messages = [
+    ChatMessage(
+      text: "Hello Doctor! How can I help you today?",
+      isUser: false,
+      time: DateTime.now().subtract(const Duration(minutes: 1)),
+    ),
+  ];
+
+  @override
+  void dispose() {
+    _messageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Medical Assistant'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(8.0),
+              reverse: false,
+              itemCount: _messages.length,
+              itemBuilder: (context, index) {
+                return _buildMessage(_messages[index]);
+              },
+            ),
+          ),
+          _buildMessageInput(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMessage(ChatMessage message) {
+    return Align(
+      alignment: message.isUser ? Alignment.centerRight : Alignment.centerLeft,
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 4.0),
+        padding: const EdgeInsets.all(12.0),
+        decoration: BoxDecoration(
+          color: message.isUser 
+              ? Colors.blue[100] 
+              : Colors.grey[200],
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              message.text,
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              DateFormat('h:mm a').format(message.time),
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey[600],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMessageInput() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _messageController,
+              decoration: InputDecoration(
+                hintText: "Type your message...",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(24.0),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 12.0,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8.0),
+          CircleAvatar(
+            backgroundColor: Colors.blue,
+            child: IconButton(
+              icon: const Icon(Icons.send, color: Colors.white),
+              onPressed: _sendMessage,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _sendMessage() {
+    if (_messageController.text.trim().isEmpty) return;
+
+    setState(() {
+      _messages.add(ChatMessage(
+        text: _messageController.text,
+        isUser: true,
+        time: DateTime.now(),
+      ));
+      
+      // Add a dummy bot response (will be replaced with AI later)
+      _messages.add(ChatMessage(
+        text: _getBotResponse(_messageController.text),
+        isUser: false,
+        time: DateTime.now().add(const Duration(seconds: 1)),
+      ));
+      
+      _messageController.clear();
+    });
+  }
+
+  String _getBotResponse(String userMessage) {
+    final lowerMessage = userMessage.toLowerCase();
+    
+    if (lowerMessage.contains('hello') || lowerMessage.contains('hi')) {
+      return "Hello! I'm your medical assistant. How can I help you today?";
+    } else if (lowerMessage.contains('blood pressure')) {
+      return "For blood pressure management, I recommend monitoring twice daily and reducing sodium intake.";
+    } else if (lowerMessage.contains('diet') || lowerMessage.contains('food')) {
+      return "Based on your patient's records, I suggest a low-sodium, high-fiber diet with plenty of vegetables.";
+    } else if (lowerMessage.contains('medication')) {
+      return "Please specify which medication you're inquiring about. I can check for interactions or side effects.";
+    } else {
+      return "I'm still learning. For complex medical questions, please consult with a specialist.";
+    }
+  }
+}
+
+class ChatMessage {
+  final String text;
+  final bool isUser;
+  final DateTime time;
+
+  ChatMessage({
+    required this.text,
+    required this.isUser,
+    required this.time,
+  });
+}
